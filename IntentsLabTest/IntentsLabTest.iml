@@ -14,6 +14,7 @@
     <orderEntry type="jdk" jdkName="Android API 18 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="robotium-solo-5.0.2-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="IntentsLab" />
   </component>
 </module>
 
