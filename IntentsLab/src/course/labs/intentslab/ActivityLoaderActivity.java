@@ -77,7 +77,7 @@ public class ActivityLoaderActivity extends Activity {
         Log.i(TAG, "Entered startImplicitActivation()");
 
         Intent baseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL));
-        Intent chooserIntent = Intent.createChooser(baseIntent, "ASD");
+        Intent chooserIntent = Intent.createChooser(baseIntent, CHOOSER_TEXT);
 
         Log.i(TAG, "Chooser Intent Action:" + chooserIntent.getAction());
         startActivity(chooserIntent);
