@@ -11,48 +11,46 @@ import android.widget.EditText;
 
 public class ExplicitlyLoadedActivity extends Activity {
 
-	static private final String TAG = "Lab-Intents";
+    static private final String TAG = "Lab-Intents";
 
-	private EditText mEditText;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		setContentView(R.layout.explicitly_loaded_activity);
+    private EditText mEditText;
 
-		// Get a reference to the EditText field
-		mEditText = (EditText) findViewById(R.id.editText);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		// Declare and setup "Enter" button
-		Button enterButton = (Button) findViewById(R.id.enter_button);
-		enterButton.setOnClickListener(new OnClickListener() {
+        setContentView(R.layout.explicitly_loaded_activity);
 
-			// Call enterClicked() when pressed
+        // Get a reference to the EditText field
+        mEditText = (EditText) findViewById(R.id.editText);
 
-			@Override
-			public void onClick(View v) {
+        // Declare and setup "Enter" button
+        Button enterButton = (Button) findViewById(R.id.enter_button);
+        enterButton.setOnClickListener(new OnClickListener() {
 
-				enterClicked();
-			
-			}
-		});
+            // Call enterClicked() when pressed
 
-	}
+            @Override
+            public void onClick(View v) {
 
-	// Sets result to send back to calling Activity and finishes
-	
-	private void enterClicked() {
+                enterClicked();
 
-		Log.i(TAG,"Entered enterClicked()");
-		
-		// TODO - Save user provided input from the EditText field
+            }
+        });
 
-		// TODO - Create a new intent and save the input from the EditText field as an extra
-		
-		// TODO - Set Activity's result with result code RESULT_OK
-		
-		// TODO - Finish the Activity
+    }
 
-	}
+    // Sets result to send back to calling Activity and finishes
+
+    private void enterClicked() {
+
+        Log.i(TAG, "Entered enterClicked()");
+
+        Intent result = getIntent();
+        result.putExtra("TEXT_MESSAGE", mEditText.getText().toString());
+        setResult(Activity.RESULT_OK, result);
+
+        finish();
+
+    }
 }
