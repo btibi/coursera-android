@@ -14,8 +14,9 @@ public class FriendsFragment extends ListFragment {
 	private static final String[] FRIENDS = { "ladygaga", "msrebeccablack",
 			"taylorswift13" };
 	private static final String TAG = "Lab-Fragments";
+    private int currentPosition = -1;
 
-	public interface SelectionListener {
+    public interface SelectionListener {
 		public void onItemSelected(int position);
 	}
 
@@ -33,6 +34,8 @@ public class FriendsFragment extends ListFragment {
 
 		// Set the list adapter for this ListFragment
 		setListAdapter(new ArrayAdapter<String>(getActivity(), layout, FRIENDS));
+
+        setRetainInstance(true);
 	}
 
 		
@@ -75,6 +78,10 @@ public class FriendsFragment extends ListFragment {
 
 			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
+            if(currentPosition != -1) {
+                mCallback.onItemSelected(currentPosition);
+            }
+
 		}
 
 	}
@@ -83,7 +90,7 @@ public class FriendsFragment extends ListFragment {
 	public void onListItemClick(ListView l, View view, int position, long id) {
 
 		// Notify the hosting Activity that a selection has been made.
-
+        currentPosition = position;
 		mCallback.onItemSelected(position);
 
 	}
