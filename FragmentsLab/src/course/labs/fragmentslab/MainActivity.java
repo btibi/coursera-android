@@ -1,82 +1,85 @@
 package course.labs.fragmentslab;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 
 public class MainActivity extends Activity implements
-		FriendsFragment.SelectionListener {
+        FriendsFragment.SelectionListener {
 
-	private static final String TAG = "Lab-Fragments";
+    private static final String TAG = "Lab-Fragments";
 
-	private FriendsFragment mFriendsFragment;
-	private FeedFragment mFeedFragment;
+    private FriendsFragment mFriendsFragment;
+    private FeedFragment mFeedFragment;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_activity);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main_activity);
 
-		// If the layout is single-pane, create the FriendsFragment 
-		// and add it to the Activity
+        // If the layout is single-pane, create the FriendsFragment
+        // and add it to the Activity
 
-		if (!isInTwoPaneMode()) {
-			
-			mFriendsFragment = new FriendsFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+        if (!isInTwoPaneMode()) {
 
-			//TODO 1 - add the FriendsFragment to the fragment_container
-			
-			
-			
+            mFriendsFragment = new FriendsFragment();
 
-		} else {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.fragment_container, mFriendsFragment);
+            fragmentTransaction.commit();
 
-			// Otherwise, save a reference to the FeedFragment for later use
 
-			mFeedFragment = (FeedFragment) getFragmentManager()
-					.findFragmentById(R.id.feed_frag);
-		}
+        } else {
 
-	}
+            // Otherwise, save a reference to the FeedFragment for later use
 
-	// If there is no fragment_container ID, then the application is in
-	// two-pane mode
+            mFeedFragment = (FeedFragment) fragmentManager
+                    .findFragmentById(R.id.feed_frag);
+        }
 
-	private boolean isInTwoPaneMode() {
+    }
 
-		return findViewById(R.id.fragment_container) == null;
-	
-	}
+    // If there is no fragment_container ID, then the application is in
+    // two-pane mode
 
-	// Display selected Twitter feed
+    private boolean isInTwoPaneMode() {
 
-	public void onItemSelected(int position) {
+        return findViewById(R.id.fragment_container) == null;
 
-		Log.i(TAG, "Entered onItemSelected(" + position + ")");
+    }
 
-		// If there is no FeedFragment instance, then create one
+    // Display selected Twitter feed
 
-		if (mFeedFragment == null)
-			mFeedFragment = new FeedFragment();
+    public void onItemSelected(int position) {
 
-		// If in single-pane mode, replace single visible Fragment
+        Log.i(TAG, "Entered onItemSelected(" + position + ")");
 
-		if (!isInTwoPaneMode()) {
+        // If there is no FeedFragment instance, then create one
 
-			//TODO 2 - replace the fragment_container with the FeedFragment
-			
+        if (mFeedFragment == null)
+            mFeedFragment = new FeedFragment();
 
-			
+        // If in single-pane mode, replace single visible Fragment
 
-			// execute transaction now
-			getFragmentManager().executePendingTransactions();
+        if (!isInTwoPaneMode()) {
 
-		}
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, mFeedFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
 
-		// Update Twitter feed display on FriendFragment
-		mFeedFragment.updateFeedDisplay(position);
+            // execute transaction now
+            fragmentManager.executePendingTransactions();
 
-	}
+        }
+
+        // Update Twitter feed display on FriendFragment
+        mFeedFragment.updateFeedDisplay(position);
+
+    }
 
 }
