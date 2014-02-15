@@ -1,6 +1,7 @@
 package course.labs.todomanager;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,7 +72,9 @@ public class ToDoListAdapter extends BaseAdapter {
 
         // from todo_item.xml.
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        RelativeLayout itemLayout = (RelativeLayout) inflater.inflate(R.layout.todo_item, parent, false);
+        final RelativeLayout itemLayout = (RelativeLayout) inflater.inflate(R.layout.todo_item, parent, false);
+
+        refreshColor(toDoItem, itemLayout);
 
         // Remember that the data that goes in this View
         // corresponds to the user interface elements defined
@@ -90,6 +93,7 @@ public class ToDoListAdapter extends BaseAdapter {
 
                 // is called when the user toggles the status checkbox
                 toDoItem.setStatus(isChecked ? Status.DONE : Status.NOTDONE);
+                refreshColor(toDoItem, itemLayout);
             }
         });
 
@@ -101,6 +105,11 @@ public class ToDoListAdapter extends BaseAdapter {
 
         // Return the View you just created
         return itemLayout;
+    }
+
+    private void refreshColor(ToDoItem toDoItem, RelativeLayout itemLayout) {
+        TextView lineButton = (TextView) itemLayout.findViewById(R.id.lineView);
+        lineButton.setBackgroundColor(toDoItem.getStatus() == Status.DONE ? Color.GREEN : Color.RED);
     }
 
     private void log(String msg) {
