@@ -58,14 +58,15 @@
                 android:text="@string/priority_string">
         </TextView>
 
-        <TextView
+        <Spinner
                 android:id="@+id/priorityView"
-                android:layout_width="50dip"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/statusCheckBox"
                 android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/StatusLabel">
-        </TextView>
+                android:layout_alignTop="@+id/StatusLabel"
+                android:entries="@array/priorites">
+        </Spinner>
 
         <TextView
                 android:id="@+id/DateLabel"

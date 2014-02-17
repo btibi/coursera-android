@@ -97,8 +97,20 @@ public class ToDoListAdapter extends BaseAdapter {
             }
         });
 
-        final TextView priorityView = (TextView) itemLayout.findViewById(R.id.priorityView);
-        priorityView.setText(toDoItem.getPriority().toString());
+        final Spinner priorityView = (Spinner) itemLayout.findViewById(R.id.priorityView);
+        priorityView.setSelection(toDoItem.getPriority().getPosition());
+
+        priorityView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                toDoItem.setPriority(ToDoItem.Priority.valueFromPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //none
+            }
+        });
 
         final TextView dateView = (TextView) itemLayout.findViewById(R.id.dateView);
         dateView.setText(ToDoItem.FORMAT.format(toDoItem.getDate()));

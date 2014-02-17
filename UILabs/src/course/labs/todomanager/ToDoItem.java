@@ -13,9 +13,28 @@ public class ToDoItem {
 
 	public static final String ITEM_SEP = System.getProperty("line.separator");
 
-	public enum Priority {
-		LOW, MED, HIGH
-	};
+    public enum Priority {
+        LOW(0), MED(1), HIGH(2);
+
+        private final int position;
+
+        Priority(int position) {
+            this.position = position;
+        }
+
+        public static Priority valueFromPosition(int position) {
+            for(Priority priority: values()) {
+                if (priority.position == position) {
+                    return priority;
+                }
+            }
+            return LOW;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+    };
 
 	public enum Status {
 		NOTDONE, DONE
