@@ -41,6 +41,11 @@ public class ToDoListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void remove(int pos) {
+        mItems.remove(pos);
+        notifyDataSetChanged();
+    }
+
     // Returns the number of ToDoItems
 
     @Override
@@ -51,7 +56,7 @@ public class ToDoListAdapter extends BaseAdapter {
     // Retrieve the number of ToDoItems
 
     @Override
-    public Object getItem(int pos) {
+    public ToDoItem getItem(int pos) {
         return mItems.get(pos);
     }
 
@@ -72,58 +77,37 @@ public class ToDoListAdapter extends BaseAdapter {
 
         // from todo_item.xml.
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        final RelativeLayout itemLayout = (RelativeLayout) inflater.inflate(R.layout.todo_item, parent, false);
+        final View view = inflater.inflate(R.layout.todo_item, parent, false);
+        view.setLongClickable(true);
 
-        refreshColorAndImage(toDoItem, itemLayout);
+        refreshColorAndImage(toDoItem, view);
 
         // Remember that the data that goes in this View
         // corresponds to the user interface elements defined
         // in the layout file
-        final TextView titleView = (TextView) itemLayout.findViewById(R.id.titleView);
+        final TextView titleView = (TextView) view.findViewById(R.id.titleView);
         titleView.setText(toDoItem.getTitle());
 
-        final CheckBox statusView = (CheckBox) itemLayout.findViewById(R.id.statusCheckBox);
+        final CheckBox statusView = (CheckBox) view.findViewById(R.id.statusCheckBox);
         statusView.setChecked(toDoItem.getStatus() == Status.DONE);
+        statusView.setOnCheckedChangeListener(new StatusChangeListener(toDoItem, view));
 
-        statusView.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                log("Entered onCheckedChanged()");
-
-                // is called when the user toggles the status checkbox
-                toDoItem.setStatus(isChecked ? Status.DONE : Status.NOTDONE);
-                refreshColorAndImage(toDoItem, itemLayout);
-            }
-        });
-
-        final Spinner priorityView = (Spinner) itemLayout.findViewById(R.id.priorityView);
+        final Spinner priorityView = (Spinner) view.findViewById(R.id.priorityView);
         priorityView.setSelection(toDoItem.getPriority().getPosition());
+        priorityView.setOnItemSelectedListener(new PrioritySelectedListener(toDoItem));
 
-        priorityView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                toDoItem.setPriority(ToDoItem.Priority.valueFromPosition(position));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                //none
-            }
-        });
-
-        final TextView dateView = (TextView) itemLayout.findViewById(R.id.dateView);
+        final TextView dateView = (TextView) view.findViewById(R.id.dateView);
         dateView.setText(ToDoItem.FORMAT.format(toDoItem.getDate()));
 
         // Return the View you just created
-        return itemLayout;
+        return view;
     }
 
-    private void refreshColorAndImage(ToDoItem toDoItem, RelativeLayout itemLayout) {
-        TextView lineButton = (TextView) itemLayout.findViewById(R.id.lineView);
+    private void refreshColorAndImage(ToDoItem toDoItem, View view) {
+        TextView lineButton = (TextView) view.findViewById(R.id.lineView);
         lineButton.setBackgroundColor(toDoItem.getStatus() == Status.DONE ? Color.GREEN : Color.RED);
 
-        ImageView imageView = (ImageView) itemLayout.findViewById(R.id.imageView);
+        ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
         imageView.setVisibility(toDoItem.isAlert() ? View.VISIBLE : View.INVISIBLE);
     }
 
@@ -136,4 +120,40 @@ public class ToDoListAdapter extends BaseAdapter {
         Log.i(TAG, msg);
     }
 
+    private class StatusChangeListener implements OnCheckedChangeListener {
+        private final ToDoItem toDoItem;
+        private final View view;
+
+        public StatusChangeListener(ToDoItem toDoItem, View view) {
+            this.toDoItem = toDoItem;
+            this.view = view;
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            log("Entered onCheckedChanged()");
+
+            // is called when the user toggles the status checkbox
+            toDoItem.setStatus(isChecked ? Status.DONE : Status.NOTDONE);
+            refreshColorAndImage(toDoItem, view);
+        }
+    }
+
+    private class PrioritySelectedListener implements AdapterView.OnItemSelectedListener {
+        private final ToDoItem toDoItem;
+
+        public PrioritySelectedListener(ToDoItem toDoItem) {
+            this.toDoItem = toDoItem;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            toDoItem.setPriority(ToDoItem.Priority.valueFromPosition(position));
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            //none
+        }
+    }
 }

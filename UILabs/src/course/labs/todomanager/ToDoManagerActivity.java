@@ -4,11 +4,10 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 import course.labs.todomanager.ToDoItem.Priority;
 import course.labs.todomanager.ToDoItem.Status;
@@ -29,6 +28,9 @@ public class ToDoManagerActivity extends ListActivity {
     private static final int MENU_DELETE = Menu.FIRST;
     private static final int MENU_DUMP = Menu.FIRST + 1;
 
+    // Ids for context menu items
+    private static final int CONTEXT_MENU_DELETE = Menu.FIRST;
+
     ToDoListAdapter mAdapter;
 
     @Override
@@ -39,12 +41,16 @@ public class ToDoManagerActivity extends ListActivity {
         mAdapter = new ToDoListAdapter(getApplicationContext());
 
         // Put divider between ToDoItems and FooterView
-        getListView().setFooterDividersEnabled(true);
+        ListView listView = getListView();
+
+        registerForContextMenu(listView);
+
+        listView.setFooterDividersEnabled(true);
 
         LayoutInflater inflater = getLayoutInflater();
-        TextView footerView = (TextView) inflater.inflate(R.layout.footer_view, getListView(), false);
+        TextView footerView = (TextView) inflater.inflate(R.layout.footer_view, listView, false);
 
-        getListView().addFooterView(footerView);
+        listView.addFooterView(footerView);
 
         footerView.setOnClickListener(new OnClickListener() {
             @Override
@@ -59,7 +65,6 @@ public class ToDoManagerActivity extends ListActivity {
         });
 
         setListAdapter(mAdapter);
-
     }
 
     @Override
@@ -103,6 +108,26 @@ public class ToDoManagerActivity extends ListActivity {
         menu.add(Menu.NONE, MENU_DELETE, Menu.NONE, "Delete all");
         menu.add(Menu.NONE, MENU_DUMP, Menu.NONE, "Dump to log");
         return true;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        menu.setHeaderTitle(mAdapter.getItem(info.position).getTitle());
+        menu.add(Menu.NONE, CONTEXT_MENU_DELETE, CONTEXT_MENU_DELETE, R.string.del_item);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case CONTEXT_MENU_DELETE:
+                mAdapter.remove(info.position);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override
