@@ -9,16 +9,23 @@ import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import course.labs.todomanager.ToDoItem.Status;
+import course.labs.todomanager.comparators.DeadLineComparator;
+import course.labs.todomanager.comparators.PriorityComparator;
+import course.labs.todomanager.comparators.TitleComparator;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ToDoListAdapter extends BaseAdapter {
 
     // List of ToDoItems
     private final List<ToDoItem> mItems = new ArrayList<ToDoItem>();
+    private Comparator<ToDoItem> comparator = new TitleComparator();
 
     private final Context mContext;
+
 
     private static final String TAG = "Lab-UserInterface";
 
@@ -31,6 +38,11 @@ public class ToDoListAdapter extends BaseAdapter {
 
     public void add(ToDoItem item) {
         mItems.add(item);
+        refresh();
+    }
+
+    private void refresh() {
+        Collections.sort(mItems, comparator);
         notifyDataSetChanged();
     }
 
@@ -118,6 +130,21 @@ public class ToDoListAdapter extends BaseAdapter {
             e.printStackTrace();
         }
         Log.i(TAG, msg);
+    }
+
+    public void orderByDeadLine() {
+        comparator = new DeadLineComparator();
+        refresh();
+    }
+
+    public void orderByPriorityAndDeadLine() {
+        comparator = new PriorityComparator();
+        refresh();
+    }
+
+    public void orderByTitle() {
+        comparator = new TitleComparator();
+        refresh();
     }
 
     private class StatusChangeListener implements OnCheckedChangeListener {

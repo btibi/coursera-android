@@ -1,5 +1,7 @@
 package course.labs.todomanager;
 
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,8 +39,16 @@ public class ToDoManagerActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         // Create a new TodoListAdapter for this ListActivity's ListView
         mAdapter = new ToDoListAdapter(getApplicationContext());
+
+        final ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ActionBar.TabListener tabListener = new TabChangeListener(mAdapter);
+        actionBar.addTab(actionBar.newTab().setText(R.string.tab_order_by_title).setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setText(R.string.tab_order_by_dead_line).setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setText(R.string.tab_order_by_priority).setTabListener(tabListener));
 
         // Put divider between ToDoItems and FooterView
         ListView listView = getListView();
@@ -86,7 +96,6 @@ public class ToDoManagerActivity extends ListActivity {
         super.onResume();
 
         // Load saved ToDoItems, if necessary
-
         if (mAdapter.getCount() == 0)
             loadItems();
     }
@@ -96,9 +105,7 @@ public class ToDoManagerActivity extends ListActivity {
         super.onPause();
 
         // Save ToDoItems
-
         saveItems();
-
     }
 
     @Override
@@ -145,12 +152,10 @@ public class ToDoManagerActivity extends ListActivity {
     }
 
     private void dump() {
-
         for (int i = 0; i < mAdapter.getCount(); i++) {
             String data = ((ToDoItem) mAdapter.getItem(i)).toLog();
             log("Item " + i + ": " + data.replace(ToDoItem.ITEM_SEP, ","));
         }
-
     }
 
     // Load stored ToDoItems
@@ -221,4 +226,36 @@ public class ToDoManagerActivity extends ListActivity {
         Log.i(TAG, msg);
     }
 
+    private class TabChangeListener implements ActionBar.TabListener {
+        private final ToDoListAdapter mAdapter;
+
+        public TabChangeListener(ToDoListAdapter mAdapter) {
+            this.mAdapter = mAdapter;
+        }
+
+        @Override
+        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+            switch (tab.getPosition()) {
+                case 1:
+                    mAdapter.orderByDeadLine();
+                    return;
+                case 2:
+                    mAdapter.orderByPriorityAndDeadLine();
+                    return;
+                default:
+                    mAdapter.orderByTitle();
+                    return;
+            }
+        }
+
+        @Override
+        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            //none
+        }
+
+        @Override
+        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            //none
+        }
+    }
 }
