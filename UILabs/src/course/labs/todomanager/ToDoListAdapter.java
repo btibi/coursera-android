@@ -74,7 +74,7 @@ public class ToDoListAdapter extends BaseAdapter {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         final RelativeLayout itemLayout = (RelativeLayout) inflater.inflate(R.layout.todo_item, parent, false);
 
-        refreshColor(toDoItem, itemLayout);
+        refreshColorAndImage(toDoItem, itemLayout);
 
         // Remember that the data that goes in this View
         // corresponds to the user interface elements defined
@@ -93,7 +93,7 @@ public class ToDoListAdapter extends BaseAdapter {
 
                 // is called when the user toggles the status checkbox
                 toDoItem.setStatus(isChecked ? Status.DONE : Status.NOTDONE);
-                refreshColor(toDoItem, itemLayout);
+                refreshColorAndImage(toDoItem, itemLayout);
             }
         });
 
@@ -119,9 +119,12 @@ public class ToDoListAdapter extends BaseAdapter {
         return itemLayout;
     }
 
-    private void refreshColor(ToDoItem toDoItem, RelativeLayout itemLayout) {
+    private void refreshColorAndImage(ToDoItem toDoItem, RelativeLayout itemLayout) {
         TextView lineButton = (TextView) itemLayout.findViewById(R.id.lineView);
         lineButton.setBackgroundColor(toDoItem.getStatus() == Status.DONE ? Color.GREEN : Color.RED);
+
+        ImageView imageView = (ImageView) itemLayout.findViewById(R.id.imageView);
+        imageView.setVisibility(toDoItem.isAlert() ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void log(String msg) {

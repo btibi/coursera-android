@@ -13,6 +13,9 @@ public class ToDoItem {
 
 	public static final String ITEM_SEP = System.getProperty("line.separator");
 
+    //one day
+    private static final long ALERT_ONE_DAY = 24 * 60 * 60 * 1000;
+
     public enum Priority {
         LOW(0), MED(1), HIGH(2);
 
@@ -108,7 +111,12 @@ public class ToDoItem {
 		mDate = date;
 	}
 
-	// Take a set of String data values and 
+    public boolean isAlert() {
+        return getStatus() == Status.NOTDONE && getDate().getTime() - new Date().getTime() < ALERT_ONE_DAY;
+    }
+
+
+    // Take a set of String data values and
 	// package them for transport in an Intent
 
 	public static void packageIntent(Intent intent, String title,
