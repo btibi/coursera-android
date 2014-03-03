@@ -78,11 +78,11 @@ public class BubbleActivity extends Activity {
     private void saveScreenSize() {
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             display.getSize(size);
             maxScreenSizeX = size.x;
             maxScreenSizeY = size.y;
-        }else{
+        } else {
             maxScreenSizeX = display.getWidth();
             maxScreenSizeY = display.getHeight();
         }
@@ -101,14 +101,19 @@ public class BubbleActivity extends Activity {
                 .getStreamVolume(AudioManager.STREAM_MUSIC)
                 / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
-        // TODO - make a new SoundPool, allowing up to 10 streams
-        mSoundPool = null;
+        // make a new SoundPool, allowing up to 10 streams
+        mSoundPool = new SoundPool(10, AudioManager.STREAM_NOTIFICATION, 0);
 
-        // TODO - set a SoundPool OnLoadCompletedListener that calls setupGestureDetector()
+        // set a SoundPool OnLoadCompletedListener that calls setupGestureDetector()
+        mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                setupGestureDetector();
+            }
+        });
 
-
-        // TODO - load the sound from res/raw/bubble_pop.wav
-        mSoundID = 0;
+        // load the sound from res/raw/bubble_pop.wav
+        mSoundID = mSoundPool.load(getApplicationContext(), R.raw.bubble_pop, 0);
 
     }
 
@@ -138,12 +143,15 @@ public class BubbleActivity extends Activity {
                     public boolean onFling(MotionEvent event1, MotionEvent event2,
                                            float velocityX, float velocityY) {
 
-                        // TODO - Implement onFling actions.
+                        // Implement onFling actions.
                         // You can get all Views in mFrame using the
                         // ViewGroup.getChildCount() method
+                        for (int i = 0; i < mFrame.getChildCount(); i++) {
+                            BubbleView bubbleView = (BubbleView) mFrame.getChildAt(i);
+                            bubbleView.deflect(velocityX, velocityY);
+                        }
 
-
-                        return false;
+                        return true;
 
                     }
 
@@ -183,10 +191,9 @@ public class BubbleActivity extends Activity {
 
     @Override
     protected void onPause() {
-
-        // TODO - Release all SoundPool resources
-
-
+        // Release all SoundPool resources
+        mSoundPool.release();
+        mSoundPool = null;
         super.onPause();
     }
 
@@ -318,8 +325,6 @@ public class BubbleActivity extends Activity {
         // Play pop sound if the BubbleView was popped
 
         private void stop(final boolean popped) {
-
-            final BubbleView actual = this;
             if (null != mMoverFuture && mMoverFuture.cancel(true)) {
 
                 // This work will be performed on the UI Thread
@@ -329,15 +334,13 @@ public class BubbleActivity extends Activity {
                     public void run() {
 
                         // Remove the BubbleView from mFrame
-                        mFrame.removeView(actual);
+                        mFrame.removeView(BubbleView.this);
 
                         if (popped) {
                             log("Pop!");
-
-                            // TODO - If the bubble was popped by user,
+                            // If the bubble was popped by user,
                             // play the popping sound
-
-
+                            mSoundPool.play(mSoundID, mStreamVolume, mStreamVolume, 0, 0, 1);
                         }
 
                         log("Bubble removed from view!");
@@ -350,12 +353,9 @@ public class BubbleActivity extends Activity {
         // Change the Bubble's speed and direction
         private synchronized void deflect(float velocityX, float velocityY) {
             log("velocity X:" + velocityX + " velocity Y:" + velocityY);
-
-            //TODO - set mDx and mDy to be the new velocities divided by the REFRESH_RATE
-
-            mDx = 0;
-            mDy = 0;
-
+            // set mDx and mDy to be the new velocities divided by the REFRESH_RATE
+            mDx = velocityX / REFRESH_RATE;
+            mDy = velocityY / REFRESH_RATE;
         }
 
         // Draw the Bubble at its current location
