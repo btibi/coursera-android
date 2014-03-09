@@ -9,168 +9,184 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class PlaceViewActivity extends ListActivity implements LocationListener {
-	private static final long FIVE_MINS = 5 * 60 * 1000;
+    private static final long FIVE_MINS = 5 * 60 * 1000;
 
-	private static String TAG = "Lab-Location";
+    private static String TAG = "Lab-Location";
 
-	// The last valid location reading
-	private Location mLastLocationReading;
+    // The last valid location reading
+    private Location mLastLocationReading;
 
-	// The ListView's adapter
-	private PlaceViewAdapter mAdapter;
+    // The ListView's adapter
+    private PlaceViewAdapter mAdapter;
 
-	// default minimum time between new location readings
-	private long mMinTime = 5000;
+    // default minimum time between new location readings
+    private long mMinTime = 5000;
 
-	// default minimum distance between old and new readings.
-	private float mMinDistance = 1000.0f;
+    // default minimum distance between old and new readings.
+    private float mMinDistance = 1000.0f;
 
-	// Reference to the LocationManager
-	private LocationManager mLocationManager;
+    // Reference to the LocationManager
+    private LocationManager mLocationManager;
 
-	// A fake location provider used for testing
-	private MockLocationProvider mMockLocationProvider;
+    // A fake location provider used for testing
+    private MockLocationProvider mMockLocationProvider;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		// TODO - Set up the app's user interface
-		// This class is a ListActivity, so it has its own ListView
-		// ListView's adapter should be a PlaceViewAdapter
+        // Set up the app's user interface
+        // This class is a ListActivity, so it has its own ListView
+        // ListView's adapter should be a PlaceViewAdapter
+        ListView listView = getListView();
+        registerForContextMenu(listView);
+        mAdapter = new PlaceViewAdapter(getApplicationContext());
 
-		// TODO - add a footerView to the ListView
-		// You can use footer_view.xml to define the footer
-		
-		
-		// When the footerView's onClick() method is called, it must issue the
-		// follow log call
-		// log("Entered footerView.OnClickListener.onClick()");
-		
-		// footerView must respond to user clicks.
-		// Must handle 3 cases:
-		// 1) The current location is new - download new Place Badge. Issue the
-		// following log call:
-		// log("Starting Place Download");
+        // add a footerView to the ListView
+        // You can use footer_view.xml to define the footer
+        listView.setFooterDividersEnabled(true);
+        TextView footerView = (TextView) getLayoutInflater().inflate(R.layout.footer_view, listView, false);
+        listView.addFooterView(footerView);
 
-		// 2) The current location has been seen before - issue Toast message.
-		// Issue the following log call:
-		// log("You already have this location badge");
-		
-		// 3) There is no current location - response is up to you. The best
-		// solution is to disable the footerView until you have a location.
-		// Issue the following log call:
-		// log("Location data is not available");
-		
+        // When the footerView's onClick() method is called, it must issue the
+        // follow log call
+        // log("Entered footerView.OnClickListener.onClick()");
+        footerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                log("Entered footerView.OnClickListener.onClick()");
+            }
+        });
 
-	}
+        // footerView must respond to user clicks.
+        // Must handle 3 cases:
+        // 1) The current location is new - download new Place Badge. Issue the
+        // following log call:
+        // log("Starting Place Download");
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+        // 2) The current location has been seen before - issue Toast message.
+        // Issue the following log call:
+        // log("You already have this location badge");
 
-		mMockLocationProvider = new MockLocationProvider(
-				LocationManager.NETWORK_PROVIDER, this);
+        // 3) There is no current location - response is up to you. The best
+        // solution is to disable the footerView until you have a location.
+        // Issue the following log call:
+        // log("Location data is not available");
 
-		// TODO - Check NETWORK_PROVIDER for an existing location reading.
-		// Only keep this last reading if it is fresh - less than 5 minutes old.
 
-		// TODO - register to receive location updates from NETWORK_PROVIDER
+        setListAdapter(mAdapter);
+    }
 
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-	@Override
-	protected void onPause() {
+        mMockLocationProvider = new MockLocationProvider(
+                LocationManager.NETWORK_PROVIDER, this);
 
-		mMockLocationProvider.shutdown();
+        // TODO - Check NETWORK_PROVIDER for an existing location reading.
+        // Only keep this last reading if it is fresh - less than 5 minutes old.
 
-		// TODO - unregister for location updates
+        // TODO - register to receive location updates from NETWORK_PROVIDER
 
-		super.onPause();
-	}
+    }
 
-	public void addNewPlace(PlaceRecord place) {
+    @Override
+    protected void onPause() {
 
-		log("Entered addNewPlace()");
-		mAdapter.add(place);
+        mMockLocationProvider.shutdown();
 
-	}
+        // TODO - unregister for location updates
 
-	@Override
-	public void onLocationChanged(Location currentLocation) {
+        super.onPause();
+    }
 
-		// TODO - Handle location updates
-		// Cases to consider
-		// 1) If there is no last location, keep the current location.
-		// 2) If the current location is older than the last location, ignore
-		// the current location
-		// 3) If the current location is newer than the last locations, keep the
-		// current location.
+    public void addNewPlace(PlaceRecord place) {
 
-	}
+        log("Entered addNewPlace()");
+        mAdapter.add(place);
 
-	@Override
-	public void onProviderDisabled(String provider) {
-		// not implemented
-	}
+    }
 
-	@Override
-	public void onProviderEnabled(String provider) {
-		// not implemented
-	}
+    @Override
+    public void onLocationChanged(Location currentLocation) {
 
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// not implemented
-	}
+        // TODO - Handle location updates
+        // Cases to consider
+        // 1) If there is no last location, keep the current location.
+        // 2) If the current location is older than the last location, ignore
+        // the current location
+        // 3) If the current location is newer than the last locations, keep the
+        // current location.
 
-	private long age(Location location) {
-		return System.currentTimeMillis() - location.getTime();
-	}
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main, menu);
-		return true;
-	}
+    @Override
+    public void onProviderDisabled(String provider) {
+        // not implemented
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.print_badges:
-			ArrayList<PlaceRecord> currData = mAdapter.getList();
-			for (int i = 0; i < currData.size(); i++) {
-				log(currData.get(i).toString());
-			}
-			return true;
-		case R.id.delete_badges:
-			mAdapter.removeAllViews();
-			return true;
-		case R.id.place_one:
-			mMockLocationProvider.pushLocation(37.422, -122.084);
-			return true;
-		case R.id.place_invalid:
-			mMockLocationProvider.pushLocation(0, 0);
-			return true;
-		case R.id.place_two:
-			mMockLocationProvider.pushLocation(38.996667, -76.9275);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+    @Override
+    public void onProviderEnabled(String provider) {
+        // not implemented
+    }
 
-	private static void log(String msg) {
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		Log.i(TAG, msg);
-	}
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // not implemented
+    }
+
+    private long age(Location location) {
+        return System.currentTimeMillis() - location.getTime();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.print_badges:
+                ArrayList<PlaceRecord> currData = mAdapter.getList();
+                for (int i = 0; i < currData.size(); i++) {
+                    log(currData.get(i).toString());
+                }
+                return true;
+            case R.id.delete_badges:
+                mAdapter.removeAllViews();
+                return true;
+            case R.id.place_one:
+                mMockLocationProvider.pushLocation(37.422, -122.084);
+                return true;
+            case R.id.place_invalid:
+                mMockLocationProvider.pushLocation(0, 0);
+                return true;
+            case R.id.place_two:
+                mMockLocationProvider.pushLocation(38.996667, -76.9275);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private static void log(String msg) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.i(TAG, msg);
+    }
 
 }
